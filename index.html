@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rajyotsava MCQ Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Tamma+2:wght@600;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: single centred card app — setup → question → results; Karnataka yellow/red on warm paper */
+:root{
+  --bg:#fbf8f1; --surface:#ffffff; --fg:#26201a; --muted:#6d6257; --line:#e5dccb;
+  --red:#b3261e; --yellow:#e9b200; --yellow-soft:#fff3c4; --chip:#f3ece0;
+  --ok:#1f7a3f; --ok-soft:#dff3e6; --bad:#b3261e; --bad-soft:#fbe1de;
+  --display:"Baloo Tamma 2",system-ui,sans-serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17130f; --surface:#211c17; --fg:#f2ebe0; --muted:#b3a796; --line:#3a3128;
+  --red:#ff7a6e; --yellow:#f2c230; --yellow-soft:#3a2f0e; --chip:#2c251e;
+  --ok:#6fd598; --ok-soft:#173623; --bad:#ff8a7e; --bad-soft:#3d1a16; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17130f; --surface:#211c17; --fg:#f2ebe0; --muted:#b3a796; --line:#3a3128;
+  --red:#ff7a6e; --yellow:#f2c230; --yellow-soft:#3a2f0e; --chip:#2c251e;
+  --ok:#6fd598; --ok-soft:#173623; --bad:#ff8a7e; --bad-soft:#3d1a16; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.5 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:680px;margin:0 auto;display:grid;gap:16px}
+.flag{display:flex;height:6px;width:64px;border-radius:3px;overflow:hidden}
+.flag i{flex:1}.flag i:first-child{background:var(--yellow)}.flag i:last-child{background:var(--red)}
+h1{font:800 clamp(26px,6vw,36px)/1.05 var(--display);margin:8px 0 0;text-wrap:balance}
+h1 span{color:var(--red)}
+h2{font:800 20px/1.2 var(--display);margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px;min-width:0}
+.label{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--chip);color:var(--fg);border-radius:999px;padding:7px 12px;font:500 13px var(--body);cursor:pointer}
+.chip small{color:var(--muted);font-weight:400}
+.chip[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.chip[aria-pressed="true"] small{color:#ffe1dd}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{border:0;border-radius:10px;padding:11px 18px;font:600 15px var(--body);cursor:pointer;background:var(--red);color:#fff}
+.btn.ghost{background:var(--chip);color:var(--fg);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+.note{background:var(--yellow-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.note b{color:var(--red)}
+/* quiz */
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog{height:6px;background:var(--chip);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--yellow);transition:width .2s}
+.topic{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--red);font-weight:600}
+.qtext{font:600 19px/1.4 var(--body);margin:0;text-wrap:pretty}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:center;text-align:left;width:100%;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:11px 12px;font:500 15px/1.35 var(--body);cursor:pointer}
+.opt .k{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;background:var(--chip);font-weight:600;font-size:13px;color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--muted)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .k{background:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .k{background:var(--bad);color:#fff}
+.fb{border-radius:10px;padding:10px 12px;font-size:14px}
+.fb.ok{background:var(--ok-soft);color:var(--fg)}
+.fb.no{background:var(--bad-soft);color:var(--fg)}
+.fb b{font-weight:600}
+.timer{font-weight:600;color:var(--fg)}
+.timer.low{color:var(--bad)}
+/* results */
+.score{font:800 56px/1 var(--display);color:var(--red);font-variant-numeric:tabular-nums}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:13px}
+.bar .track{grid-column:1/-1;height:6px;background:var(--chip);border-radius:3px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--ok)}
+.bar .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.review{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.review li{border-left:3px solid var(--bad);padding:6px 10px;background:var(--chip);border-radius:0 8px 8px 0;font-size:14px}
+.review li .a{color:var(--ok);font-weight:600}
+.review li .y{color:var(--bad)}
+.kbd{font-size:12px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="flag"><i></i><i></i></div>
+    <h1>Rajyotsava <span>MCQ Practice</span></h1>
+    <p class="muted" style="margin:6px 0 0">Pick a topic, answer four-option questions, and see the right answer with a short note after each one.</p>
+  </header>
+
+  <!-- SETUP -->
+  <section id="setup" class="card">
+    <div class="note"><b>Remember:</b> CM is <b>D.K. Shivakumar</b> (since 3 June 2026) · 2026 = <b>71st</b> Rajyotsava · <b>71</b> awards · Phalke 2024 = <b>Anant Nag</b>.</div>
+    <div>
+      <div class="label">Topic</div>
+      <div class="chips" id="topics" style="margin-top:8px"></div>
+    </div>
+    <div>
+      <div class="label">How many questions</div>
+      <div class="chips" id="counts" style="margin-top:8px"></div>
+    </div>
+    <div>
+      <div class="label">Options</div>
+      <div class="chips" style="margin-top:8px">
+        <button class="chip" id="optStar" aria-pressed="false">★ Most likely only</button>
+        <button class="chip" id="optTimer" aria-pressed="false">⏱ 15-second timer</button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn" id="start">Start quiz</button>
+      <button class="btn ghost" id="weak" hidden>Practise my mistakes</button>
+      <span class="muted" id="pool" style="font-size:13px"></span>
+    </div>
+    <div class="muted" id="best" style="font-size:13px"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="card" hidden>
+    <div class="top"><span id="qnum"></span><span id="timer" class="timer"></span><span id="live"></span></div>
+    <div class="prog"><i id="progbar" style="width:0"></i></div>
+    <div class="topic" id="qtopic"></div>
+    <p class="qtext" id="qtext"></p>
+    <div class="opts" id="opts"></div>
+    <div id="fb" class="fb" hidden></div>
+    <div class="row" style="justify-content:space-between">
+      <button class="btn ghost" id="quit">End quiz</button>
+      <button class="btn" id="next" hidden>Next</button>
+    </div>
+    <div class="muted kbd">Keys: 1–4 to answer, Enter for next.</div>
+  </section>
+
+  <!-- RESULTS -->
+  <section id="results" class="card" hidden>
+    <div class="label">Your score</div>
+    <div class="row" style="align-items:baseline;gap:12px"><div class="score" id="score"></div><div class="muted" id="scoreTxt"></div></div>
+    <div class="bars" id="bars"></div>
+    <div class="row">
+      <button class="btn" id="retryWrong">Retry the ones I missed</button>
+      <button class="btn ghost" id="again">New quiz</button>
+    </div>
+    <div id="revWrap">
+      <h2 style="margin-bottom:8px">Review what you missed</h2>
+      <ul class="review" id="review"></ul>
+    </div>
+  </section>
+</div>
+
+<script>
+const TOPICS={L:"Latest 2025–26",C:"Cinema, Media, Music & Culture",A:"Literature, Language & Awards",P:"Government, Politics & Institutions",N:"Geography, Nature & Temples",M:"Science, Sports, Business & Personalities",H:"History & Heritage"};
+const OWNERS={L:"Everyone",C:"Karthik",A:"Abhilash",P:"Pavan",N:"Nuthan",M:"Manoj",H:"Manish"};
+// [topic, star, question, correct, wrong1, wrong2, wrong3, note]
+const Q=[
+["L",1,"Who is the current Chief Minister of Karnataka?","D.K. Shivakumar","Siddaramaiah","B.S. Yediyurappa","H.D. Kumaraswamy","Sworn in on 3 June 2026 after Siddaramaiah resigned."],
+["L",1,"Who is the Governor of Karnataka?","Thaawarchand Gehlot","Vajubhai Vala","H.R. Bhardwaj","Arif Mohammed Khan","Governor since July 2021."],
+["L",1,"Which Rajyotsava was celebrated on 1 November 2026?","71st","70th","69th","72nd","Karnataka was formed on 1 Nov 1956."],
+["L",1,"How many people received the Rajyotsava Award in 2026?","71","70","69","67","One award for each year of the state. In 2025 there were 70."],
+["L",1,"What does each Rajyotsava Award winner receive?","₹5 lakh and a 25 g gold medal","₹1 lakh and a 20 g gold medal","₹10 lakh and a 50 g gold medal","₹2 lakh and a silver plaque",""],
+["L",0,"Which actor received the Rajyotsava Award in 2025?","Prakash Raj","Sudeep","Darshan","Upendra",""],
+["L",1,"Who received the Dadasaheb Phalke Award for 2024?","Anant Nag","Mohanlal","Mithun Chakraborty","Shiva Rajkumar","Announced 16 Sept 2026, presented 22 Sept 2026. Mohanlal got it for 2023."],
+["L",1,"Who was the first Kannada actor to receive the Dadasaheb Phalke Award?","Dr. Rajkumar","Vishnuvardhan","Ambareesh","Anant Nag","Rajkumar got it in 1995. Anant Nag is the second."],
+["L",0,"Where was the 72nd National Film Awards ceremony held?","Ekta Nagar (Kevadia), Gujarat","New Delhi","Mumbai","Panaji, Goa","The first time the ceremony was held outside Delhi."],
+["L",1,"Which film won Best Kannada Film at the 72nd National Film Awards?","Mithya","Kantara","Bheema","Blink","Directed by Sumanth Bhat. It won 3 awards."],
+["L",0,"Who directed the National Award-winning Kannada film Mithya?","Sumanth Bhat","Rishab Shetty","Raj B. Shetty","Hemanth M. Rao",""],
+["L",1,"Which Kannada book won the International Booker Prize 2025?","Heart Lamp","Tomb of Sand","Samskara","Parva","By Banu Mushtaq. The first Kannada book and first short-story collection to win."],
+["L",0,"Who translated Heart Lamp into English?","Deepa Bhasthi","Daisy Rockwell","A.K. Ramanujan","Srinath Perur",""],
+["L",0,"Who inaugurated Mysuru Dasara 2025?","Banu Mushtaq","S.L. Bhyrappa","Sudha Murty","Hamsalekha","Hamsalekha inaugurated it in 2023."],
+["L",1,"Who are the Karnataka Ratna recipients announced in 2025?","Vishnuvardhan and B. Saroja Devi","Ambareesh and Leelavathi","Shankar Nag and Kalpana","Anant Nag and Bharathi","Both posthumous. Presentation on 19 Nov 2026."],
+["L",0,"Vishnuvardhan and B. Saroja Devi are which numbered Karnataka Ratna recipients?","10th and 11th","8th and 9th","12th and 13th","9th and 10th",""],
+["L",1,"Who won the Kendra Sahitya Akademi Award 2025 for Kannada?","Amaresh Nugadoni","K.V. Narayana","Banu Mushtaq","Vivek Shanbhag","For the short-story collection 'Dada Seerisu Tande'."],
+["L",0,"Who won the Sahitya Akademi Award 2024 for Kannada?","K.V. Narayana","Amaresh Nugadoni","Kum. Veerabhadrappa","Jayant Kaikini","For 'Nudigala Alivu' (literary criticism)."],
+["L",0,"Who won the Bal Sahitya Puraskar 2025 for Kannada?","K. Shivalingappa Handihal","H.S. Venkateshamurthy","N.S. Lakshminarayana Bhatta","Kanchyani Sharanappa","For 'Notebook'."],
+["L",0,"Which Kannada poet did the state recommend for the Bharat Ratna in 2025?","Kuvempu","D.R. Bendre","Shivaram Karanth","D.V. Gundappa",""],
+["L",1,"Which team won its first IPL title in 2025?","Royal Challengers Bengaluru","Punjab Kings","Mumbai Indians","Chennai Super Kings","RCB beat Punjab Kings in the final on 3 June 2025."],
+["L",0,"Which new body governs Bengaluru city from 2025?","Greater Bengaluru Authority","BBMP","BDA","BMRDA","The city was split into 5 corporations under the GBA."],
+["L",0,"What is the new name of Ramanagara district (2025)?","Bengaluru South","Kempegowda district","Bengaluru Rural","New Bengaluru",""],
+
+["C",1,"Which is the first Kannada talkie film?","Sati Sulochana","Bhakta Dhruva","Bedara Kannappa","Mricchakatika","Released 3 March 1934."],
+["C",1,"Who directed Sati Sulochana (1934)?","Y.V. Rao","Puttanna Kanagal","H.L.N. Simha","Gubbi Veeranna",""],
+["C",0,"Which is generally cited as the first Kannada silent feature film?","Mricchakatika (1929)","Sati Sulochana (1934)","Bhakta Prahlada (1932)","Harishchandra (1913)","Directed by Mohan Bhavnani."],
+["C",0,"Which was the second Kannada talkie, also released in 1934?","Bhakta Dhruva","Samsara Nauka","Chiranjeevi","Vasantasena",""],
+["C",1,"What is the Kannada film industry popularly called?","Sandalwood","Mollywood","Tollywood","Kollywood","Its traditional hub is Gandhinagar, Bengaluru."],
+["C",1,"Which is the first Kannada colour feature film?","Amarashilpi Jakanachari","Bedara Kannappa","Mayor Muthanna","Sant Tukaram","Released in 1964."],
+["C",1,"Who played the lead role in Bedara Kannappa (1954)?","Dr. Rajkumar","Udaya Kumar","Kalyan Kumar","Rajashankar","It was Rajkumar's debut as hero."],
+["C",1,"What was Dr. Rajkumar's real name?","Singanalluru Puttaswamaiah Muthuraj","Sampath Kumar","M.H. Amarnath","Lohith","Sampath Kumar = Vishnuvardhan, Amarnath = Ambareesh, Lohith = Puneeth."],
+["C",1,"Who is popularly called 'Nata Sarvabhouma'?","Dr. Rajkumar","Vishnuvardhan","Ambareesh","Shankar Nag",""],
+["C",1,"Who is popularly called 'Abhinaya Bhargava'?","Vishnuvardhan","Dr. Rajkumar","Anant Nag","Srinath",""],
+["C",1,"Who is popularly called 'Rebel Star'?","Ambareesh","Darshan","Upendra","Shiva Rajkumar",""],
+["C",1,"Who is popularly called 'Power Star'?","Puneeth Rajkumar","Shiva Rajkumar","Sudeep","Yash",""],
+["C",1,"Who is called 'Abhinaya Saraswathi'?","B. Saroja Devi","Kalpana","Bharathi","Leelavathi",""],
+["C",1,"For which song did Dr. Rajkumar win the National Award for Best Male Playback Singer?","Naadamaya Ee Lokavella","Huttidare Kannada Naadalli","Hrudaya Samudra Kalaki","Yaare Koogadali","From the film Jeevana Chaitra (1992)."],
+["C",1,"The Rajyotsava song 'Huttidare Kannada Naadalli Huttabeku' is from which film?","Aakasmika","Mayura","Bangarada Manushya","Jeevana Chaitra","Sung by Dr. Rajkumar (1993)."],
+["C",1,"What was Vishnuvardhan's first film as lead hero?","Naagarahaavu","Bandhana","Bhootayyana Maga Ayyu","Muthina Hara","1972, directed by Puttanna Kanagal."],
+["C",0,"Who directed Naagarahaavu (1972)?","Puttanna Kanagal","Siddalingaiah","Girish Kasaravalli","Dorai–Bhagavan",""],
+["C",1,"For which film did Puneeth Rajkumar win a National Award as a child artist?","Bettada Hoovu","Chalisuva Modagalu","Bhakta Prahlada","Eradu Nakshatragalu","Released in 1985."],
+["C",0,"In which year did Puneeth Rajkumar receive the Karnataka Ratna?","2022","2021","2019","2023","Posthumously, on 1 Nov 2022."],
+["C",0,"What was B. Saroja Devi's debut film?","Mahakavi Kalidasa","Kittur Chennamma","Babruvahana","Bhookailasa","Released in 1955."],
+["C",1,"Which Kannada film won the President's Gold Medal for Best Feature Film in 1970?","Samskara","Chomana Dudi","Ghatashraddha","Vamsha Vriksha","Based on U.R. Ananthamurthy's novel."],
+["C",1,"Who directed Ghatashraddha (1977)?","Girish Kasaravalli","B.V. Karanth","Girish Karnad","T.S. Nagabharana",""],
+["C",0,"How many times has Girish Kasaravalli won the Golden Lotus for Best Film?","4","2","3","6","A record."],
+["C",0,"Who directed Chomana Dudi (1975)?","B.V. Karanth","Puttanna Kanagal","Girish Kasaravalli","Pattabhirama Reddy",""],
+["C",1,"Who directed KGF: Chapter 1 and Chapter 2?","Prashanth Neel","Rishab Shetty","Pawan Kumar","Rakshit Shetty",""],
+["C",0,"Which company produced KGF and Kantara?","Hombale Films","KRG Studios","Jayanna Combines","Rockline Entertainments",""],
+["C",1,"Who directed and acted in Kantara (2022)?","Rishab Shetty","Raj B. Shetty","Rakshit Shetty","Yash",""],
+["C",0,"Which National Award did Rishab Shetty win for Kantara?","Best Actor","Best Director","Best Screenplay","Best Debut Director","At the 70th National Film Awards."],
+["C",1,"Which ritual art of Tulu Nadu is shown in Kantara?","Bhoota Kola","Yakshagana","Kambala","Huli Vesha",""],
+["C",0,"Which film won Best Kannada Film at the 70th National Film Awards?","KGF: Chapter 2","Kantara","777 Charlie","Vikrant Rona",""],
+["C",0,"Which film won Best Kannada Film at the 69th National Film Awards?","777 Charlie","Dollu","Act 1978","Garuda Gamana Vrishabha Vahana",""],
+["C",1,"Who directed the TV series Malgudi Days (1986)?","Shankar Nag","Anant Nag","Girish Karnad","T.S. Nagabharana","Stories by R.K. Narayan."],
+["C",0,"Where was most of Malgudi Days shot?","Agumbe","Madikeri","Sakleshpur","Sringeri",""],
+["C",1,"Who is known as 'Naadabrahma' in Kannada film music?","Hamsalekha","Ilaiyaraaja","Rajan–Nagendra","Gurukiran",""],
+["C",0,"Who composed the music for Kantara, including 'Varaha Roopam'?","B. Ajaneesh Loknath","Ravi Basrur","Arjun Janya","V. Harikrishna",""],
+["C",0,"Who composed the music for KGF?","Ravi Basrur","B. Ajaneesh Loknath","Arjun Janya","Charan Raj",""],
+["C",1,"Which singer won a National Film Award for 'Kaadu Kudure Odi Banditta'?","Shimoga Subbanna","P.B. Sreenivas","C. Ashwath","S.P. Balasubrahmanyam",""],
+["C",1,"Which is the first Kannada newspaper?","Mangaluru Samachara","Prajavani","Samyukta Karnataka","Kannada Prabha","Started in 1843."],
+["C",1,"Who started Mangaluru Samachara?","Hermann Mögling","Ferdinand Kittel","B.L. Rice","Hermann Gundert","A Basel Mission missionary."],
+["C",0,"In which year was Mangaluru Samachara started?","1843","1856","1799","1881",""],
+["C",0,"What is Doordarshan's Kannada channel called?","DD Chandana","DD Sahyadri","DD Podhigai","DD Saptagiri","Sahyadri is Marathi, Podhigai Tamil, Saptagiri Telugu."],
+["C",1,"In which city was the name 'Akashvani' first used (1936)?","Mysuru","Bengaluru","New Delhi","Chennai","Coined by Prof. M.V. Gopalaswamy."],
+["C",0,"Which public broadcaster runs Doordarshan and Akashvani?","Prasar Bharati","Doordarshan Trust","BECIL","Press Trust of India",""],
+["C",0,"Who publishes the Kannada newspaper Samyukta Karnataka?","Lok Shikshana Trust","The Printers (Mysore)","Manipal Media Network","Times Group",""],
+["C",0,"Who is often called the father of Kannada journalism?","M. Venkatakrishnaiah","Hermann Mögling","D.V. Gundappa","Tirumale Tatacharya Sharma","Also known as Tataiah."],
+["C",0,"Which was the first private Kannada TV channel?","Udaya TV","Zee Kannada","Suvarna","ETV Kannada","Launched in 1994."],
+["C",1,"Who is known as the father of Carnatic music (Karnataka Sangeeta Pitamaha)?","Purandara Dasa","Kanakadasa","Tyagaraja","Vyasaraja",""],
+["C",1,"Which Hindustani vocalist from Karnataka received the Bharat Ratna in 2008?","Pt. Bhimsen Joshi","Mallikarjun Mansur","Kumar Gandharva","Basavaraj Rajguru","Born in Gadag."],
+["C",0,"Bhimsen Joshi belonged to which gharana?","Kirana","Gwalior","Jaipur-Atrauli","Agra",""],
+["C",0,"Who was Gangubai Hangal?","A Hindustani classical vocalist","A Carnatic violinist","A Bharatanatyam dancer","A Kannada novelist",""],
+["C",1,"Who composed the widely used tune of the state anthem 'Jaya Bharata Jananiya Tanujate'?","Mysore Ananthaswamy","C. Ashwath","P. Kalinga Rao","Hamsalekha","The lyrics are by Kuvempu."],
+["C",1,"Who wrote the lyrics of the song 'Nityotsava'?","K.S. Nissar Ahmed","Kuvempu","G.S. Shivarudrappa","Chennaveera Kanavi","Music by Mysore Ananthaswamy."],
+["C",0,"What was Kanakadasa's original name?","Thimmappa Nayaka","Srinivasa Nayaka","Basavappa","Rangappa Nayaka","Srinivasa Nayaka was Purandara Dasa's original name."],
+["C",0,"Dollu Kunitha gets its name from what?","A large drum","Brass cymbals","Ankle bells","Wooden sticks","Performed by the Kuruba community."],
+["C",0,"The cymbal dance Kamsale is associated with which deity?","Male Mahadeshwara","Chamundeshwari","Manjunatha","Yellamma",""],
+["C",1,"What is Karnataka's 'Nada Habba' (state festival)?","Mysuru Dasara","Hampi Utsav","Ugadi","Bengaluru Karaga",""],
+["C",0,"In which year did the Wadiyars start celebrating Dasara?","1610","1799","1565","1881","Under Raja Wadiyar I at Srirangapatna."],
+["C",1,"Whose idol is carried in the golden howdah during the Dasara Jamboo Savari?","Chamundeshwari","Bhuvaneshwari","Lakshmi","Durga Parameshwari",""],
+["C",0,"About how heavy is the golden howdah in the Mysuru Dasara procession?","750 kg","250 kg","500 kg","1,000 kg",""],
+["C",1,"Which traditional dance-drama is associated with coastal Karnataka?","Yakshagana","Kathakali","Kuchipudi","Dollu Kunitha",""],
+["C",0,"What are the two main styles of Yakshagana?","Tenkutittu and Badagutittu","Mudalapaya and Paduvalapaya","Doddata and Sannata","Kelike and Bayalata",""],
+["C",1,"What is Kambala?","A buffalo race in slushy fields","A bull-taming sport","A boat race","A wrestling contest","Held in Dakshina Kannada and Udupi."],
+["C",0,"What is Togalu Gombeyata?","Leather shadow puppetry","Stick dance","Mask dance","Temple music",""],
+["C",0,"The Kadalekai Parishe groundnut fair is held in which part of Bengaluru?","Basavanagudi","Malleshwaram","Jayanagar","Chickpet","Near the Dodda Basavanna (Bull) temple."],
+["C",1,"Which community leads the Bengaluru Karaga festival?","Tigala","Kuruba","Vokkaliga","Bunt",""],
+["C",0,"At which temple is the Bengaluru Karaga held?","Dharmaraya Swamy temple","Gavi Gangadhareshwara temple","Dodda Basavanna temple","Banashankari temple",""],
+["C",1,"Who founded the theatre institute Ninasam at Heggodu?","K.V. Subbanna","B.V. Karanth","Gubbi Veeranna","Prasanna","He won the Magsaysay Award in 1991."],
+["C",0,"Who founded Rangayana in Mysuru?","B.V. Karanth","K.V. Subbanna","Prasanna","Girish Karnad","Founded in 1989."],
+["C",1,"Which town is known as 'Gombegala Ooru' (toy town)?","Channapatna","Kinnal","Kondapalli","Ramanagara",""],
+["C",0,"Bidriware craft comes from which district?","Bidar","Kalaburagi","Raichur","Vijayapura",""],
+
+["A",1,"What is the earliest extant major work of Kannada literature?","Kavirajamarga","Vaddaradhane","Adipurana","Gadayuddha","About 850 CE."],
+["A",1,"Which king is associated with Kavirajamarga?","Amoghavarsha I","Pulakeshin II","Vishnuvardhana","Krishnadevaraya","The poet Srivijaya is also linked to it."],
+["A",0,"What is the earliest major surviving Kannada prose work?","Vaddaradhane","Kavirajamarga","Chavundaraya Purana","Shabdamanidarpana","Attributed to Shivakotiacharya."],
+["A",1,"Who is known as 'Adikavi' in Kannada literature?","Pampa","Ponna","Ranna","Janna",""],
+["A",0,"Who wrote Vikramarjuna Vijaya (Pampa Bharata)?","Pampa","Ranna","Ponna","Kumaravyasa",""],
+["A",0,"Who wrote Gadayuddha?","Ranna","Pampa","Ponna","Harihara",""],
+["A",1,"Who are the 'Ratnatraya' (three gems) of Kannada literature?","Pampa, Ponna, Ranna","Pampa, Janna, Harihara","Basavanna, Allama, Akka Mahadevi","Kumaravyasa, Lakshmisha, Raghavanka",""],
+["A",0,"Who wrote the grammar Shabdamanidarpana?","Keshiraja","Nagavarma","Bhattakalanka","Durgasimha",""],
+["A",0,"Who wrote Karnata Bharata Kathamanjari (Gadugina Bharata)?","Kumaravyasa","Lakshmisha","Raghavanka","Harihara",""],
+["A",1,"Who wrote Mankuthimmana Kagga?","D.V. Gundappa","Kuvempu","D.R. Bendre","Masti Venkatesha Iyengar",""],
+["A",0,"Who wrote the novel Malegalalli Madumagalu?","Kuvempu","Shivaram Karanth","S.L. Bhyrappa","Poornachandra Tejasvi",""],
+["A",1,"How many Kannada writers have received the Jnanpith Award?","8","6","7","9","The most for any Dravidian language."],
+["A",1,"Who was the first Kannada Jnanpith award winner?","Kuvempu","D.R. Bendre","Masti Venkatesha Iyengar","Shivaram Karanth","In 1967."],
+["A",1,"For which work did Kuvempu receive the Jnanpith?","Sri Ramayana Darshanam","Malegalalli Madumagalu","Kanuru Heggaditi","Kolalu",""],
+["A",0,"Who was the second Kannada Jnanpith award winner?","D.R. Bendre","Shivaram Karanth","Masti Venkatesha Iyengar","V.K. Gokak","In 1973."],
+["A",0,"For which work did D.R. Bendre receive the Jnanpith?","Naaku Tanti","Gari","Sakhigeeta","Nadaleele","All four are Bendre's works."],
+["A",1,"Who is the most recent (8th) Kannada Jnanpith winner?","Chandrashekhara Kambar","Girish Karnad","U.R. Ananthamurthy","S.L. Bhyrappa","In 2010."],
+["A",1,"Who wrote Mookajjiya Kanasugalu?","K. Shivaram Karanth","Masti Venkatesha Iyengar","V.K. Gokak","Chandrashekhara Kambar","Jnanpith 1977."],
+["A",0,"Chikkaveera Rajendra, a Jnanpith-winning work, was written by?","Masti Venkatesha Iyengar","Shivaram Karanth","V.K. Gokak","Kuvempu","Jnanpith 1983."],
+["A",1,"Who wrote Samskara?","U.R. Ananthamurthy","S.L. Bhyrappa","Girish Karnad","Poornachandra Tejasvi",""],
+["A",1,"Who wrote the play Tughlaq?","Girish Karnad","Chandrashekhara Kambar","P. Lankesh","T.P. Kailasam",""],
+["A",1,"Who was Karnataka's first Rashtrakavi?","M. Govinda Pai","Kuvempu","G.S. Shivarudrappa","D.R. Bendre","Manjeshwar Govinda Pai."],
+["A",0,"Who was named Karnataka's third Rashtrakavi in 2006?","G.S. Shivarudrappa","Chennaveera Kanavi","K.S. Narasimhaswamy","K.S. Nissar Ahmed",""],
+["A",1,"Who is popularly called 'Varakavi'?","D.R. Bendre","Kuvempu","Masti Venkatesha Iyengar","Pu.Ti. Narasimhachar",""],
+["A",0,"What was D.R. Bendre's pen name?","Ambikatanayadatta","Srinivasa","Kavishishya","Jadabharata","Srinivasa was Masti's pen name."],
+["A",1,"Which is the earliest substantial Kannada inscription?","Halmidi inscription","Brahmagiri inscription","Badami inscription","Shravanabelagola inscription","About 450 CE, of the Kadamba king Kakusthavarma."],
+["A",1,"Who wrote the state anthem 'Jaya Bharata Jananiya Tanujate'?","Kuvempu","D.R. Bendre","M. Govinda Pai","Huilgol Narayana Rao","Huilgol wrote 'Udayavagali Namma Cheluva Kannada Nadu'."],
+["A",0,"What is Kuvempu's full name?","Kuppali Venkatappa Puttappa","Kuppali Venkataramana Puttaswamy","Kodagu Venkatesh Puttappa","Kuppali Veerappa Puttanna",""],
+["A",1,"In which year did Kannada get classical language status?","2008","2004","2005","2013","Tamil 2004, Sanskrit 2005, Malayalam 2013."],
+["A",0,"Mudramanjusha (1823), an early Kannada prose novel, was written by?","Kempu Narayana","Gulvadi Venkata Rao","B. Venkatacharya","Galaganatha","Classifications of the 'first novel' vary."],
+["A",0,"Indira Bai (1899), often called the first social novel in Kannada, was written by?","Gulvadi Venkata Rao","Kempu Narayana","Galaganatha","Shivaram Karanth",""],
+["A",1,"In which year was the Kannada Sahitya Parishat founded?","1915","1905","1925","1956","In Bengaluru."],
+["A",0,"Who presided over the first Akhila Bharata Kannada Sahitya Sammelana (1915)?","H.V. Nanjundaiah","Kuvempu","Masti Venkatesha Iyengar","Aluru Venkata Rao",""],
+["A",1,"What is Karnataka's highest literary award?","Pampa Award","Nrupatunga Award","Basava Puraskara","Rajyotsava Award","Given since 1987. Kuvempu was the first winner."],
+["A",0,"Who won the Saraswati Samman for the novel 'Mandra'?","S.L. Bhyrappa","Chandrashekhara Kambar","U.R. Ananthamurthy","Vivek Shanbhag","In 2010."],
+["A",1,"Which of these is NOT a Vachanakara?","Kumaravyasa","Basavanna","Akka Mahadevi","Allama Prabhu","Kumaravyasa wrote the Gadugina Bharata."],
+["A",1,"The 'Kanakana Kindi' at Udupi Krishna temple is named after whom?","Kanakadasa","Purandara Dasa","Madhvacharya","Vyasaraja",""],
+["A",0,"The Kannada script developed from which script?","Kadamba script","Grantha","Devanagari","Sharada","Telugu shares the same root."],
+
+["P",1,"When was the enlarged Mysore State (today's Karnataka) formed?","1 November 1956","15 August 1947","26 January 1950","1 November 1973",""],
+["P",0,"Under which Act was the state formed in 1956?","States Reorganisation Act, 1956","Government of India Act, 1935","Indian Independence Act, 1947","Andhra State Act, 1953",""],
+["P",1,"When was Mysore State renamed Karnataka?","1 November 1973","1 November 1956","1 November 1972","26 January 1975",""],
+["P",1,"Who was Chief Minister when Mysore State was renamed Karnataka?","D. Devaraj Urs","S. Nijalingappa","Veerendra Patil","R. Gundu Rao",""],
+["P",0,"How was the 50th year of the name 'Karnataka' celebrated in 2023?","Karnataka Sambhrama 50","Suvarna Karnataka","Kannada Habba 50","Hampi Utsav","'Suvarna Karnataka' marked 50 years of the state in 2006."],
+["P",1,"Who is called 'Karnataka Kulapurohita'?","Aluru Venkata Rao","Kengal Hanumanthaiah","Huilgol Narayana Rao","Gangadhar Rao Deshpande","Leader of the unification movement."],
+["P",1,"Who was the first Chief Minister of Mysore State after Independence?","K.C. Reddy","Kengal Hanumanthaiah","S. Nijalingappa","Kadidal Manjappa","K. Chengalaraya Reddy, from 1947."],
+["P",0,"Who was Chief Minister of Mysore State just before the 1956 reorganisation?","Kadidal Manjappa","K.C. Reddy","S. Nijalingappa","B.D. Jatti","Correction to the PDF: Kengal Hanumanthaiah served 1952–Aug 1956, then Kadidal Manjappa held office until 31 Oct 1956. Check which answer your quiz expects."],
+["P",1,"Who became Chief Minister when the enlarged Mysore State was formed in 1956?","S. Nijalingappa","K.C. Reddy","Kengal Hanumanthaiah","B.D. Jatti",""],
+["P",1,"Which Chief Minister built the Vidhana Soudha?","Kengal Hanumanthaiah","Sir M. Visvesvaraya","D. Devaraj Urs","S. Nijalingappa","Completed in 1956."],
+["P",1,"Where is the Suvarna Vidhana Soudha?","Belagavi","Kalaburagi","Mysuru","Hubballi","The legislature's winter session is held there."],
+["P",0,"Where is the principal seat of the Karnataka High Court?","Bengaluru","Mysuru","Dharwad","Kalaburagi","In the Attara Kacheri building."],
+["P",0,"Where are the two benches of the Karnataka High Court?","Dharwad and Kalaburagi","Mysuru and Mangaluru","Belagavi and Ballari","Hubballi and Shivamogga",""],
+["P",1,"How many elected seats are in the Karnataka Legislative Assembly?","224","225","234","200",""],
+["P",0,"How many members are in the Karnataka Legislative Council?","75","63","78","90",""],
+["P",1,"How many Lok Sabha constituencies are in Karnataka?","28","25","26","30",""],
+["P",0,"How many Rajya Sabha seats does Karnataka have?","12","10","11","16",""],
+["P",0,"Is Karnataka's state legislature unicameral or bicameral?","Bicameral","Unicameral","Tricameral","Neither",""],
+["P",0,"What is the upper house of the Karnataka legislature called?","Legislative Council (Vidhan Parishad)","Legislative Assembly (Vidhan Sabha)","Rajya Sabha","Gram Sabha",""],
+["P",0,"How many seats did Congress win in the 2023 Assembly election?","135","124","104","113",""],
+["P",0,"Who was the first Governor of the enlarged Mysore State in 1956?","Jayachamarajendra Wadiyar","Krishnaraja Wadiyar IV","Sir Mirza Ismail","V.V. Giri",""],
+["P",0,"Who was the first woman Governor of Karnataka?","V.S. Ramadevi","Margaret Alva","Sarojini Naidu","Fathima Beevi",""],
+["P",0,"What does KPSC stand for?","Karnataka Public Service Commission","Karnataka Police Service Corps","Karnataka Public Sector Council","Karnataka Panchayat Service Commission",""],
+["P",1,"Who was the first Prime Minister of India from Karnataka?","H.D. Deve Gowda","S. Nijalingappa","M. Veerappa Moily","Mallikarjun Kharge",""],
+["P",0,"In which year was the Mysore Representative Assembly established?","1881","1907","1857","1923",""],
+["P",1,"Who is Karnataka's longest-serving Chief Minister?","Siddaramaiah","D. Devaraj Urs","S.M. Krishna","Ramakrishna Hegde","He passed Devaraj Urs's record in Jan 2025."],
+["P",1,"How many districts does Karnataka have?","31","30","28","32",""],
+["P",0,"Which is Karnataka's newest district (2021)?","Vijayanagara","Chamarajanagar","Yadgir","Chikkaballapur",""],
+["P",1,"What is Karnataka's state emblem?","Gandabherunda","Lion Capital","Elephant","Garuda","A two-headed mythical bird."],
+["P",0,"What are the colours of the Kannada flag?","Yellow and red","Red and white","Yellow and green","Saffron and white","Designed by M. Ramamurthy."],
+["P",1,"What is Karnataka's highest civilian award?","Karnataka Ratna","Rajyotsava Award","Pampa Award","Basava Puraskara","Given since 1992."],
+["P",0,"Who were the first recipients of the Karnataka Ratna in 1992?","Kuvempu and Dr. Rajkumar","S. Nijalingappa and C.N.R. Rao","Bhimsen Joshi and Kuvempu","Dr. Rajkumar and Vishnuvardhan",""],
+["P",0,"Since which year has the Rajyotsava Award been given?","1966","1956","1973","1992",""],
+["P",1,"What does the Shakti guarantee scheme provide?","Free bus travel for women","₹2,000 a month to women heads of family","200 units of free electricity","Free rice","Gruha Lakshmi gives ₹2,000, Gruha Jyothi gives 200 units, Anna Bhagya gives rice."],
+["P",1,"Which article gives special status to the Kalyana Karnataka region?","Article 371(J)","Article 370","Article 371(A)","Article 356","The region was renamed from Hyderabad-Karnataka in 2019."],
+["P",0,"How much of a signboard must be in Kannada under the 2024 rule?","60%","50%","75%","100%",""],
+["P",1,"Who founded Bengaluru, and when?","Kempegowda, 1537","Hyder Ali, 1761","Krishnadevaraya, 1510","Tipu Sultan, 1790",""],
+["P",1,"When is Engineers' Day celebrated in India?","15 September","5 September","14 November","1 November","The birth anniversary of Sir M. Visvesvaraya."],
+["P",1,"Which Mysore king did Gandhi call 'Rajarshi'?","Nalwadi Krishnaraja Wadiyar IV","Chamarajendra Wadiyar X","Jayachamarajendra Wadiyar","Raja Wadiyar I",""],
+["P",0,"Under which year's Act was the Karnataka Lokayukta set up?","1984","1971","1995","2013",""],
+
+["N",1,"What is the highest peak in Karnataka?","Mullayanagiri","Kudremukh","Baba Budangiri","Kumara Parvatha","About 1,930 m, in Chikkamagaluru district."],
+["N",0,"What is Karnataka's rank among Indian states by area?","6th","5th","7th","8th","About 1,91,791 sq km."],
+["N",0,"Which sea lies to the west of Karnataka?","Arabian Sea","Bay of Bengal","Andaman Sea","Laccadive Sea only",""],
+["N",1,"Which of these states does NOT border Karnataka?","Odisha","Goa","Telangana","Kerala","Karnataka borders Goa, Maharashtra, Telangana, Andhra Pradesh, Tamil Nadu and Kerala."],
+["N",1,"Where does the river Kaveri rise?","Talakaveri","Bhagamandala","Kudremukh","Nandi Hills","Bhagamandala is the confluence just below it."],
+["N",1,"Which river is called 'Dakshina Ganga'?","Kaveri","Krishna","Tungabhadra","Sharavathi",""],
+["N",0,"Where do the Tunga and Bhadra rivers meet?","Koodli","Kudalasangama","Srirangapatna","T. Narasipura","Kudalasangama is where the Krishna and Malaprabha meet."],
+["N",1,"Which river forms Jog Falls?","Sharavathi","Kali","Netravati","Tunga",""],
+["N",0,"In which district is Jog Falls located?","Shivamogga","Uttara Kannada","Chikkamagaluru","Udupi",""],
+["N",0,"What are the four streams of Jog Falls called?","Raja, Rani, Rocket, Roarer","Raja, Rani, Bheema, Arjuna","Ganga, Yamuna, Saraswati, Kaveri","Gagana, Bhara, Raja, Rani",""],
+["N",0,"On which river is the Shivanasamudra hydroelectric plant (1902), one of Asia's earliest?","Kaveri","Sharavathi","Krishna","Kali",""],
+["N",1,"Which river flows beside Hampi?","Tungabhadra","Kaveri","Krishna","Malaprabha",""],
+["N",1,"The Krishna Raja Sagara (KRS) dam is built across which river?","Kaveri","Hemavati","Kabini","Krishna","Built under Sir M. Visvesvaraya."],
+["N",0,"The Almatti dam is built across which river?","Krishna","Tungabhadra","Kaveri","Bhima",""],
+["N",0,"Gokak Falls is on which river?","Ghataprabha","Malaprabha","Sharavathi","Kali",""],
+["N",1,"Which was Karnataka's first tiger reserve?","Bandipur","Nagarhole","BRT","Bhadra","Under Project Tiger, 1973."],
+["N",0,"Kudremukh National Park lies mainly in which district?","Chikkamagaluru","Kodagu","Udupi","Hassan",""],
+["N",1,"Which state has the most wild elephants in India?","Karnataka","Kerala","Assam","Odisha",""],
+["N",0,"Which bird sanctuary near Srirangapatna is a Ramsar site?","Ranganathittu","Kokkare Bellur","Gudavi","Bonal",""],
+["N",1,"Which place is called the 'Cherrapunji of the South'?","Agumbe","Madikeri","Sakleshpur","Sringeri",""],
+["N",1,"Which district is called the 'Scotland of India'?","Kodagu","Chikkamagaluru","Hassan","Uttara Kannada",""],
+["N",1,"Who first planted coffee in India, at Chikkamagaluru?","Baba Budan","Tipu Sultan","Robert Clive","Hyder Ali","The hills are now called Baba Budangiri."],
+["N",1,"Which is India's only working primary gold mine?","Hutti","Kolar Gold Fields","Sandur","Kudremukh","In Raichur district. Kolar closed in 2001."],
+["N",1,"Which city is called the 'City of Palaces'?","Mysuru","Bengaluru","Vijayapura","Belagavi",""],
+["N",1,"What is Karnataka's state bird?","Indian roller (Neelakanta)","Peacock","Common myna","Great hornbill",""],
+["N",1,"What is Karnataka's state animal?","Indian elephant","Tiger","Gaur","Lion-tailed macaque",""],
+["N",1,"What is Karnataka's state tree?","Sandalwood","Banyan","Teak","Neem",""],
+["N",0,"What is Karnataka's state flower?","Lotus","Mysore Mallige (jasmine)","Rose","Champak",""],
+["N",0,"In which year were the Hoysala temples of Belur, Halebidu and Somanathapura added to the UNESCO list?","2023","2014","2019","1986",""],
+["N",0,"In which year was Hampi declared a UNESCO World Heritage Site?","1986","1987","1983","2003","Pattadakal followed in 1987."],
+["N",1,"Which UNESCO site was the capital of Vijayanagara?","Hampi","Pattadakal","Badami","Halebidu",""],
+["N",1,"Which dynasty built the monuments at Pattadakal?","Badami Chalukyas","Hoysalas","Rashtrakutas","Kadambas",""],
+["N",0,"In which district is Pattadakal?","Bagalkot","Vijayapura","Belagavi","Koppal",""],
+["N",1,"What is the Vittala temple in Hampi famous for?","The stone chariot and musical pillars","The whispering gallery","The 57-ft monolith","The golden howdah",""],
+["N",1,"Where is Gol Gumbaz?","Vijayapura","Kalaburagi","Bidar","Srirangapatna","Famous for its whispering gallery."],
+["N",0,"Gol Gumbaz is the tomb of which ruler?","Mohammed Adil Shah","Ibrahim Adil Shah II","Yusuf Adil Shah","Tipu Sultan","Ibrahim Adil Shah II is buried at Ibrahim Rauza."],
+["N",1,"Where is the Gomateshwara statue located?","Shravanabelagola","Karkala","Venur","Dharmasthala","In Hassan district. The others have smaller Bahubali statues."],
+["N",0,"About how tall is the Gomateshwara monolith at Shravanabelagola?","57 ft","35 ft","42 ft","108 ft","The 108-ft statue is Kempegowda's at Bengaluru airport."],
+["N",1,"Which dynasty built the Chennakeshava temple at Belur?","Hoysalas","Badami Chalukyas","Western Gangas","Vijayanagara",""],
+["N",1,"Which place is called the 'cradle of Indian temple architecture'?","Aihole","Badami","Pattadakal","Hampi",""],
+["N",0,"Where is the Sharada Peetha founded by Adi Shankaracharya?","Sringeri","Udupi","Melukote","Gokarna","On the banks of the Tunga."],
+["N",0,"Which temple town is linked with the Atmalinga of Lord Shiva?","Gokarna","Dharmasthala","Kollur","Kukke Subramanya",""],
+["N",0,"Which coastal temple town has one of the world's tallest Shiva statues?","Murudeshwar","Udupi","Kollur","Gokarna",""],
+
+["M",1,"Which engineer from Karnataka received the Bharat Ratna in 1955?","Sir M. Visvesvaraya","Raja Ramanna","C.N.R. Rao","U.R. Rao",""],
+["M",1,"Which Karnataka scientist received the Bharat Ratna in 2014?","C.N.R. Rao","U.R. Rao","Raja Ramanna","C.V. Raman","A chemist at Bengaluru."],
+["M",1,"Who discovered the Raman Effect?","C.V. Raman","C.N.R. Rao","Homi Bhabha","S.N. Bose",""],
+["M",1,"In which year did C.V. Raman receive the Nobel Prize in Physics?","1930","1913","1928","1950","He announced the effect on 28 Feb 1928, now National Science Day."],
+["M",0,"Who founded the Raman Research Institute in Bengaluru?","C.V. Raman","Homi Bhabha","Vikram Sarabhai","Satish Dhawan","In 1948."],
+["M",1,"Where is ISRO headquartered?","Bengaluru","Sriharikota","Thiruvananthapuram","Ahmedabad",""],
+["M",0,"What does ISRO stand for?","Indian Space Research Organisation","Indian Satellite Research Office","International Space Research Organisation","Indian Space and Rocket Organisation",""],
+["M",0,"Which ISRO chairman led India's first satellite, Aryabhata?","U.R. Rao","K. Kasturirangan","Satish Dhawan","K. Sivan",""],
+["M",0,"In which year was IISc Bengaluru founded?","1909","1911","1899","1947",""],
+["M",1,"Which royal family supported the founding of IISc alongside Jamsetji Tata?","The Mysore royal family","The Travancore royal family","The Nizam of Hyderabad","The Gaekwads of Baroda",""],
+["M",1,"Where is Hindustan Aeronautics Limited (HAL) headquartered?","Bengaluru","Nashik","Hyderabad","Lucknow","HAL makes the Tejas fighter jet."],
+["M",1,"Who were the founders of Infosys?","N.R. Narayana Murthy and six co-founders","Azim Premji and family","Shiv Nadar and partners","Nandan Nilekani alone","Murthy was its first CEO."],
+["M",0,"Where is Infosys headquartered?","Bengaluru","Pune","Mysuru","Hyderabad","It was started in Pune in 1981 and moved to Bengaluru."],
+["M",1,"Who founded the business that later became Wipro?","Mohamed Premji","Azim Premji","N.R. Narayana Murthy","Kiran Mazumdar-Shaw","It began as Western India Vegetable Products. His son Azim Premji built Wipro."],
+["M",1,"Who founded Biocon?","Kiran Mazumdar-Shaw","Sudha Murty","Indra Nooyi","Falguni Nayar",""],
+["M",0,"Which Bengaluru tech leader led the Aadhaar project?","Nandan Nilekani","N.R. Narayana Murthy","Azim Premji","Kris Gopalakrishnan",""],
+["M",1,"Which soap has been made by a Karnataka state company since 1916?","Mysore Sandal Soap","Medimix","Cinthol","Lifebuoy",""],
+["M",1,"What is the KMF milk brand called?","Nandini","Amul","Aavin","Milma",""],
+["M",1,"Which region is called the 'cradle of Indian banking'?","Dakshina Kannada and Udupi","Mumbai","Kolkata","Chennai","Canara, Corporation, Vijaya, Syndicate and Karnataka Bank all started there."],
+["M",0,"Who founded Canara Bank in Mangaluru in 1906?","Ammembal Subba Rao Pai","T.M.A. Pai","Khan Bahadur Haji Abdullah","A.B. Shetty",""],
+["M",0,"Who founded Café Coffee Day?","V.G. Siddhartha","S.M. Krishna","Vijay Mallya","N.R. Narayana Murthy",""],
+["M",0,"Which Bengaluru restaurant is credited with inventing rava idli?","MTR (Mavalli Tiffin Rooms)","Vidyarthi Bhavan","CTR","Brahmin's Coffee Bar",""],
+["M",1,"Who is popularly called 'The Wall' in Indian cricket?","Rahul Dravid","Anil Kumble","G.R. Vishwanath","Javagal Srinath",""],
+["M",1,"Which Karnataka cricketer is known as 'Jumbo'?","Anil Kumble","Javagal Srinath","Venkatesh Prasad","E.A.S. Prasanna",""],
+["M",1,"Who took all 10 wickets in a Test innings against Pakistan in 1999?","Anil Kumble","Javagal Srinath","Harbhajan Singh","B.S. Chandrasekhar","At Delhi."],
+["M",1,"Who was the first Indian to win the All England badminton title?","Prakash Padukone","Pullela Gopichand","Syed Modi","Saina Nehwal","In 1980."],
+["M",0,"Which badminton player from Kodagu represented India at the Olympics?","Ashwini Ponnappa","Saina Nehwal","P.V. Sindhu","Jwala Gutta",""],
+["M",1,"Who was the first Indian woman to win an Olympic medal?","Karnam Malleswari","P.T. Usha","Saina Nehwal","Mary Kom","Weightlifting, 2000. She is from Andhra Pradesh."],
+["M",1,"Which Bengaluru player has won many world billiards and snooker titles?","Pankaj Advani","Geet Sethi","Michael Ferreira","Aditya Mehta",""],
+["M",1,"Which Karnataka tennis player became the oldest doubles world No.1 in 2024?","Rohan Bopanna","Leander Paes","Mahesh Bhupathi","Somdev Devvarman","He also won the 2024 Australian Open doubles."],
+["M",0,"Which district is called the 'cradle of Indian hockey'?","Kodagu","Mysuru","Belagavi","Dharwad",""],
+["M",0,"Which Bengaluru-born mathematician was called the 'human computer'?","Shakuntala Devi","Srinivasa Ramanujan","C.R. Rao","Anand Kumar",""],
+["M",0,"Which nuclear scientist from Karnataka led the 1974 Pokhran test?","Raja Ramanna","Homi Bhabha","A.P.J. Abdul Kalam","R. Chidambaram",""],
+["M",0,"Which Karnataka writer and philanthropist became a Rajya Sabha member in 2024?","Sudha Murty","Kiran Mazumdar-Shaw","Banu Mushtaq","Prathibha Nandakumar",""],
+["M",1,"Which Mysuru sculptor carved the Ram Lalla idol at Ayodhya?","Arun Yogiraj","Ashok Gudigar","K. Venkatappa","Kanaka Murthy","He got the Rajyotsava Award in 2024."],
+
+["H",1,"Which is regarded as the first indigenous Kannada ruling dynasty?","Kadambas","Western Gangas","Badami Chalukyas","Hoysalas",""],
+["H",1,"Who founded the Kadamba dynasty?","Mayurasharma","Pulakeshin I","Dantidurga","Sala","Also written Mayuravarma."],
+["H",1,"What was the Kadamba capital?","Banavasi","Talakad","Badami","Halebidu",""],
+["H",0,"Who founded the Badami Chalukya line?","Pulakeshin I","Pulakeshin II","Kirtivarman I","Vikramaditya I",""],
+["H",1,"Which Chalukya ruler stopped Harshavardhana on the Narmada?","Pulakeshin II","Pulakeshin I","Vikramaditya II","Kirtivarman II",""],
+["H",0,"Who composed the Aihole inscription praising Pulakeshin II?","Ravikirti","Pampa","Srivijaya","Kalidasa",""],
+["H",0,"What was the capital of the Badami Chalukyas?","Vatapi (Badami)","Manyakheta","Kalyani","Banavasi",""],
+["H",0,"Who founded the Rashtrakuta imperial power?","Dantidurga","Amoghavarsha I","Krishna I","Dhruva",""],
+["H",1,"What was the Rashtrakuta capital?","Manyakheta (Malkhed)","Vatapi","Talakad","Dwarasamudra",""],
+["H",0,"Which Rashtrakuta king built the Kailasa temple at Ellora?","Krishna I","Amoghavarsha I","Dantidurga","Govinda III",""],
+["H",1,"Who commissioned the Gomateshwara statue at Shravanabelagola?","Chavundaraya","Vishnuvardhana","Amoghavarsha I","Krishnadevaraya","Around 981 CE, a minister of the Western Gangas."],
+["H",0,"Which dynasty ruled from Talakad for centuries?","Western Gangas","Kadambas","Hoysalas","Rashtrakutas",""],
+["H",1,"Which Hoysala ruler built the Chennakeshava temple at Belur?","Vishnuvardhana","Veera Ballala II","Narasimha I","Vinayaditya","Built in 1117 to mark his victory at Talakad."],
+["H",1,"What was the later Hoysala capital?","Dwarasamudra (Halebidu)","Belur","Sosevur","Talakad",""],
+["H",0,"What is the Hoysala royal emblem?","Sala fighting a tiger","A boar","A two-headed eagle","A lion",""],
+["H",1,"Who founded the Vijayanagara Empire?","Harihara I and Bukka Raya I","Krishnadevaraya","Deva Raya II","Rama Raya","Guided by the sage Vidyaranya."],
+["H",1,"In which year was the Vijayanagara Empire founded?","1336","1347","1509","1565",""],
+["H",1,"Who was the famous Tuluva emperor of Vijayanagara?","Krishnadevaraya","Harihara II","Deva Raya I","Achyuta Deva Raya","The Ashtadiggajas (8 poets) were in his court."],
+["H",1,"Which battle in 1565 dealt a major blow to Vijayanagara?","Battle of Talikota","Battle of Raichur","Third Battle of Panipat","Battle of Srirangapatna","Also called Rakkasa-Tangadi."],
+["H",0,"Which Persian traveller visited Vijayanagara?","Abdur Razzak","Domingo Paes","Fernao Nuniz","Nicolo de Conti","Paes and Nuniz were Portuguese, Conti was Italian."],
+["H",1,"Which dynasty ruled the Kingdom of Mysore for most of its history?","Wadiyar","Nayaka","Adil Shahi","Bahmani",""],
+["H",1,"Who is known as the 'Tiger of Mysore'?","Tipu Sultan","Hyder Ali","Krishnaraja Wadiyar III","Sangolli Rayanna",""],
+["H",1,"Which Mysore ruler died in the Fourth Anglo-Mysore War in 1799?","Tipu Sultan","Hyder Ali","Chikka Devaraja Wadiyar","Krishnaraja Wadiyar III","At Srirangapatna."],
+["H",1,"Basavanna's Anubhava Mantapa is often called what?","The world's first parliament","The first university","The first library","The first court of law","12th century, at Basavakalyan."],
+["H",1,"Where did Chandragupta Maurya spend his last days?","Shravanabelagola","Pataliputra","Ujjain","Hampi","On Chandragiri hill."],
+["H",1,"Which Ashokan edict first mentions the name 'Ashoka'?","Maski","Brahmagiri","Sannati","Girnar","In Raichur district."],
+["H",1,"Who led the 1824 revolt against the British at Kittur?","Rani Chennamma","Rani Abbakka","Onake Obavva","Keladi Chennamma",""],
+["H",1,"Which Kittur warrior was hanged by the British in 1831?","Sangolli Rayanna","Amatur Balappa","Gurusiddappa","Veerappa",""],
+["H",1,"Who defended the Chitradurga fort with a pestle (onake)?","Onake Obavva","Kittur Chennamma","Rani Abbakka","Belavadi Mallamma",""],
+["H",0,"Which queen of Ullal fought the Portuguese?","Rani Abbakka","Keladi Chennamma","Kittur Chennamma","Belavadi Mallamma",""],
+["H",1,"Where was the only Congress session presided over by Gandhi held?","Belagavi (1924)","Haripura (1938)","Lahore (1929)","Kakinada (1923)",""],
+["H",1,"Which 1938 firing is called the 'Jallianwala Bagh of Karnataka'?","Vidurashwatha","Shivapura","Isuru","Ankola","In Chikkaballapur district."],
+["H",0,"Which Shivamogga village declared itself independent in 1942?","Isuru","Ankola","Vidurashwatha","Shivapura",""],
+["H",1,"Which was the first city in Asia to get electric street lights?","Bengaluru","Mumbai","Kolkata","Tokyo","In 1905."],
+["H",0,"Where is Basavanna's samadhi (aikya mantapa)?","Kudalasangama","Basavakalyan","Ulavi","Srisailam","At the meeting of the Krishna and Malaprabha."]
+];
+
+// ---- state
+let topic="ALL", count=20, starOnly=false, timerOn=false;
+let deck=[], idx=0, right=0, answers=[], tHandle=null, tLeft=0;
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+function pool(){return Q.map((q,i)=>i).filter(i=>(topic==="ALL"||Q[i][0]===topic)&&(!starOnly||Q[i][1]));}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function renderSetup(){
+  const ts=[["ALL","All topics",Q.length]].concat(Object.keys(TOPICS).map(k=>[k,TOPICS[k]+" · "+OWNERS[k],Q.filter(q=>q[0]===k).length]));
+  $("topics").innerHTML=ts.map(([k,n,c])=>`<button class="chip" data-t="${k}" aria-pressed="${k===topic}">${n} <small>${c}</small></button>`).join("");
+  $("counts").innerHTML=[10,20,50,0].map(n=>`<button class="chip" data-c="${n}" aria-pressed="${n===count}">${n||"All"}</button>`).join("");
+  const p=pool().length; $("pool").textContent=`${p} questions match`; $("start").disabled=!p;
+  const wrong=store.get("rq_wrong",[]).filter(i=>i<Q.length);
+  $("weak").hidden=!wrong.length; $("weak").textContent=`Practise my mistakes (${wrong.length})`;
+  const b=store.get("rq_best",null); $("best").textContent=b?`Your best so far: ${b.pct}% (${b.r}/${b.n}).`:"";
+}
+$("topics").onclick=e=>{const b=e.target.closest("[data-t]");if(!b)return;topic=b.dataset.t;renderSetup();};
+$("counts").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;count=+b.dataset.c;renderSetup();};
+$("optStar").onclick=()=>{starOnly=!starOnly;$("optStar").setAttribute("aria-pressed",starOnly);renderSetup();};
+$("optTimer").onclick=()=>{timerOn=!timerOn;$("optTimer").setAttribute("aria-pressed",timerOn);};
+
+function begin(ids){
+  deck=ids.map(i=>{const q=Q[i];return{i,t:q[0],q:q[2],a:q[3],o:shuffle([q[3],q[4],q[5],q[6]]),x:q[7]};});
+  idx=0;right=0;answers=[];
+  $("setup").hidden=true;$("results").hidden=true;$("quiz").hidden=false;show();
+}
+$("start").onclick=()=>{let ids=shuffle(pool());if(count)ids=ids.slice(0,count);begin(ids);};
+$("weak").onclick=()=>begin(shuffle(store.get("rq_wrong",[]).filter(i=>i<Q.length)));
+
+function show(){
+  const d=deck[idx];
+  $("qnum").textContent=`Question ${idx+1} of ${deck.length}`;
+  $("live").textContent=`${right} correct`;
+  $("progbar").style.width=(idx/deck.length*100)+"%";
+  $("qtopic").textContent=TOPICS[d.t];
+  $("qtext").textContent=d.q;
+  $("opts").innerHTML=d.o.map((o,k)=>`<button class="opt" data-k="${k}"><span class="k">${k+1}</span><span></span></button>`).join("");
+  [...$("opts").children].forEach((b,k)=>b.lastChild.textContent=d.o[k]);
+  $("fb").hidden=true;$("next").hidden=true;
+  clearInterval(tHandle);$("timer").textContent="";
+  if(timerOn){tLeft=15;tick();tHandle=setInterval(()=>{tLeft--;tick();if(tLeft<=0){clearInterval(tHandle);pick(-1);}},1000);}
+  $("opts").firstChild.focus({preventScroll:true});
+}
+function tick(){$("timer").textContent=`⏱ ${tLeft}s`;$("timer").classList.toggle("low",tLeft<=5);}
+function pick(k){
+  const d=deck[idx]; if(!$("next").hidden)return; clearInterval(tHandle);
+  const chosen=k>=0?d.o[k]:null, ok=chosen===d.a;
+  if(ok)right++;
+  answers.push({d,chosen,ok});
+  [...$("opts").children].forEach((b,j)=>{b.disabled=true;if(d.o[j]===d.a)b.classList.add("right");else if(j===k)b.classList.add("wrong");});
+  const fb=$("fb");fb.hidden=false;fb.className="fb "+(ok?"ok":"no");
+  fb.innerHTML="";const s=document.createElement("b");s.textContent=ok?"Correct. ":(k<0?"Time's up. ":"Not quite. ")+(ok?"":"Answer: "+d.a+". ");fb.appendChild(s);
+  if(d.x)fb.appendChild(document.createTextNode(d.x));
+  $("live").textContent=`${right} correct`;
+  $("next").hidden=false;$("next").textContent=idx===deck.length-1?"See results":"Next";$("next").focus({preventScroll:true});
+}
+$("opts").onclick=e=>{const b=e.target.closest(".opt");if(b&&!b.disabled)pick(+b.dataset.k);};
+$("next").onclick=()=>{if(idx<deck.length-1){idx++;show();}else finish();};
+$("quit").onclick=()=>{clearInterval(tHandle);if(answers.length)finish();else{ $("quiz").hidden=true;$("setup").hidden=false;renderSetup();}};
+document.addEventListener("keydown",e=>{
+  if($("quiz").hidden)return;
+  if(/^[1-4]$/.test(e.key)&&$("next").hidden){pick(+e.key-1);}
+  else if(e.key==="Enter"&&!$("next").hidden&&document.activeElement!==$("next")){e.preventDefault();$("next").click();}
+});
+
+function finish(){
+  clearInterval(tHandle);
+  const n=answers.length, pct=n?Math.round(right/n*100):0;
+  $("quiz").hidden=true;$("results").hidden=false;
+  $("score").textContent=pct+"%";
+  $("scoreTxt").textContent=`${right} of ${n} correct`+(pct>=80?" · quiz-ready":pct>=60?" · nearly there":" · keep practising");
+  const by={};answers.forEach(a=>{(by[a.d.t]=by[a.d.t]||{r:0,n:0}).n++;if(a.ok)by[a.d.t].r++;});
+  $("bars").innerHTML=Object.keys(TOPICS).filter(k=>by[k]).map(k=>`<div class="bar"><span>${TOPICS[k]} <span class="muted">· ${OWNERS[k]}</span></span><span class="n">${by[k].r}/${by[k].n}</span><span class="track"><i style="width:${by[k].r/by[k].n*100}%"></i></span></div>`).join("");
+  const missed=answers.filter(a=>!a.ok);
+  // remember mistakes per viewer; remove ones now answered right
+  let wrong=new Set(store.get("rq_wrong",[]));answers.forEach(a=>a.ok?wrong.delete(a.d.i):wrong.add(a.d.i));store.set("rq_wrong",[...wrong]);
+  const best=store.get("rq_best",null);if(n>=10&&(!best||pct>best.pct))store.set("rq_best",{pct,r:right,n});
+  $("revWrap").hidden=!missed.length;$("retryWrong").hidden=!missed.length;
+  const ul=$("review");ul.innerHTML="";
+  missed.forEach(a=>{const li=document.createElement("li");
+    li.innerHTML=`<div></div><div><span class="a"></span> <span class="y"></span></div>`;
+    li.children[0].textContent=a.d.q;li.querySelector(".a").textContent="✓ "+a.d.a;
+    li.querySelector(".y").textContent=a.chosen?"· you said "+a.chosen:"· no answer";ul.appendChild(li);});
+  $("retryWrong").onclick=()=>begin(shuffle(missed.map(a=>a.d.i)));
+}
+$("again").onclick=()=>{$("results").hidden=true;$("setup").hidden=false;renderSetup();};
+renderSetup();
+</script>
+
+</body>
+</html>
